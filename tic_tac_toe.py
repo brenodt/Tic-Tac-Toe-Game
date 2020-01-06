@@ -1,4 +1,4 @@
-from random import random
+from random import choice
 
 
 class TicTacToe:
@@ -8,13 +8,26 @@ class TicTacToe:
             [0, 0, 0],
             [0, 0, 0]
         ]
+        self.available_moves = {1: (0, 0),
+                                2: (0, 1),
+                                3: (0, 2),
+                                4: (1, 0),
+                                5: (1, 1),
+                                6: (1, 2),
+                                7: (2, 0),
+                                8: (2, 1),
+                                9: (2, 2)
+                                }
         self.computer = "x"
         self.user = "o"
         self.difficulty = "easy"
         self.mode = "single"
+        self.score_user01 = 0
+        self.score_user02 = 0
+        self.score_computer = 0
 
     def choose_difficulty(self, choice: str):
-        if choice != "easy" and choice != "hard":  # checks if choice is valid, otherwise return 0
+        if choice != "easy" and choice != "medium" and choice != "hard":  # checks if choice is valid, if not return 0
             return 0
         self.difficulty = choice
         return 1
@@ -33,27 +46,52 @@ class TicTacToe:
 
     def slot_available(self, pos: tuple):
         row, column = pos
-        if self.board[row][column] == 0:  # if chosen position is valid, return 1
+        if self.board[int(row)][int(column)] == 0:  # if chosen position is valid, return 1
             return 1
         return 0
+
+    def move_key(self, pos: tuple):
+        if pos == (0, 0):
+            return 1
+        elif pos == (0, 1):
+            return 2
+        elif pos == (0, 2):
+            return 3
+        elif pos == (1, 0):
+            return 4
+        elif pos == (1, 1):
+            return 5
+        elif pos == (1, 2):
+            return 6
+        elif pos == (2, 0):
+            return 7
+        elif pos == (2, 1):
+            return 8
+        elif pos == (2, 2):
+            return 9
+        return -1
 
     # easy mode means the computer will play at random
     # hard mode means the computer will run a backtracking algorithm to determine next move
     def next_move(self):
         if self.difficulty == "easy":
             while True:
-                row = int(random() * 2)  # random integer between 0 and 2
-                column = int(random() * 2)
+                current_move = choice(list(self.available_moves))
                 # verify if random position chosen is available
-                is_valid = self.slot_available((row, column))
+                is_valid = self.slot_available(self.available_moves[current_move])
 
                 if is_valid:
+                    row, column = self.available_moves[current_move]
                     # self.board[row][column] = self.computer  # changes position value to pc piece
-                    # unecessary as it will be done in GUI Level once function is called
+                    # self.available_moves.pop(current_move)
+                    # both statements are unnecessary as it will be done in GUI Level once function is called
+                    # this is only used when debugging the class directly thru play_game()
+
                     return row, column
 
                     break
-
+        elif self.difficulty == "medium":
+            pass
         elif self.difficulty == "hard":
             pass
 
@@ -82,6 +120,43 @@ class TicTacToe:
 
         return 0, 0
 
+    # Verifies if game has tied
+    # returns 0 if game has NOT tied
+    # returns 1 if game has tied
+    def has_tied(self):
+        for row in self.board:
+            if 0 in row:
+                return 0
+        return 1
+
+    # Resets "all" control variables or "part" of control variables
+    # All: used to fully reset the game, restart
+    # Part: used to clear board an piece options, but score ramains
+    def reset(self, option: str):
+        self.board = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ]
+        self.available_moves = {1: (0, 0),
+                                2: (0, 1),
+                                3: (0, 2),
+                                4: (1, 0),
+                                5: (1, 1),
+                                6: (1, 2),
+                                7: (2, 0),
+                                8: (2, 1),
+                                9: (2, 2)
+                                }
+        if option == "all":
+            self.computer = "x"
+            self.user = "o"
+            self.mode = "single"
+            self.score_user01 = 0
+            self.score_user02 = 0
+            self.score_computer = 0
+
+    # rough print used to debug game logic
     def print_board(self):
         for row in range(3):
             print("  ___ ___ ___")
@@ -105,55 +180,89 @@ class TicTacToe:
     def play_game(self):
         # 1
         difficulty = input("Choose Difficulty: ").lower()
-        self.choose_difficulty(difficulty)
-        # 2
-        piece = input("Choose your piece: ").lower()
-        self.choose_pieces(piece)
-        # 3
-        if self.user == "x":
-            while True:
-                self.print_board()
-                # 3.1
-                move = input("Choose your position (row,column): ")
-                row, column = move.split(",")
-                # add a try except here
-                if self.slot_available((row, column)):
-                    self.board[row][column] = self.user
-                    # 3.2
-                    self.next_move()
-                    # 4
-                    game_ended = self.has_won()
-                    if game_ended[0] == 1:
-                        print(f"{game_ended[1].upper()} has won!")
-                        break
-                    # 5
-                    self.print_board()
-                else:
-                    print("Position already taken! Choose another one.")
-        if self.computer == "x":
-            while True:
-                # 3.2
-                self.next_move()
-                self.print_board()
-                # 3.1
-                while True:
-                    move = input("Choose your position (row,column): ")
-                    row, column = move.split(",")
-                    # add a try except here
-                    row = int(row)
-                    column = int(column)
-                    if self.slot_available((row, column)):
-                        self.board[row][column] = self.user
-                        break
-                    else:
-                        print("Position already taken! Choose another one.")
-                # 4
-                game_ended = self.has_won()
-                if game_ended[0] == 1:
-                    print(f"{game_ended[1].upper()} has won!")
-                    break
-                # 5
-                self.print_board()
+        if self.choose_difficulty(difficulty):
+            # 2
+            piece = input("Choose your piece: ").lower()
+            if self.choose_pieces(piece):
+                # 3
+                if self.user == "x":
+                    while True:
+                        self.print_board()
+                        # 3.1
+                        move = input("Choose your position (row,column): ")
+                        row, column = move.split(",")
+                        row = int(row)
+                        column = int(column)
+                        # add a try except here
+                        if self.slot_available((row, column)):
+                            self.board[row][column] = self.user
+                            my_move = self.move_key((row, column))
+                            if my_move == -1:
+                                break
+                                print("here")
+                            else:
+                                self.available_moves.pop(my_move)
+
+                            game_ended = self.has_won()
+                            if game_ended[0] == 1:
+                                print(f"{game_ended[1].upper()} has won!")
+                                break
+                            if self.has_tied():
+                                print("Game tied!")
+                                break
+                            # 3.2
+                            self.next_move()
+                            if self.has_tied():
+                                print("Game tied!")
+                                break
+                            # 4
+                            game_ended = self.has_won()
+                            if game_ended[0] == 1:
+                                print(f"{game_ended[1].upper()} has won!")
+                                break
+                            # 5
+                            self.print_board()
+                        else:
+                            print("Position already taken! Choose another one.")
+                if self.computer == "x":
+                    while True:
+                        # 3.2
+                        self.next_move()
+                        self.print_board()
+
+                        if self.has_tied():
+                            print("Game tied!")
+                            break
+                        game_ended = self.has_won()
+                        if game_ended[0] == 1:
+                            print(f"{game_ended[1].upper()} has won!")
+                            break
+
+                        # 3.1
+                        while True:
+                            move = input("Choose your position (row,column): ")
+                            row, column = move.split(",")
+
+                            if self.slot_available((row, column)):
+                                self.board[int(row)][int(column)] = self.user
+                                my_move = self.move_key((row, column))
+                                if my_move == -1:
+                                    break
+                                else:
+                                    self.available_moves.pop(my_move)
+                                if self.has_tied():
+                                    print("Game tied!")
+                                    break
+                                # 4
+                                game_ended = self.has_won()
+                                if game_ended[0] == 1:
+                                    print(f"{game_ended[1].upper()} has won!")
+                                    break
+                            else:
+                                print("Position already taken! Choose another one.")
+
+                        # 5
+                        self.print_board()
 
 
 # my_board = TicTacToe()

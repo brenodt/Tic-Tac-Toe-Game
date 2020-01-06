@@ -11,7 +11,11 @@ class Application(QMainWindow, TicTacToe):
         self.setWindowIcon(QtGui.QIcon('./UI/hashtag_icon.svg'))  # modifying original icon
         self.setWindowTitle("Tic Tac Toe")  # renaming window title
 
-        self.mode_selected = ""
+        # timer configured to update the QLed on screen
+        self.timer_clock = QtCore.QTimer(self)
+        self.timer_clock.setInterval(1000)  # 1000 ms == 1 second
+        self.minutes = 0
+        self.seconds = 0
 
         # locks GUI size to be 450x450
         self.resize(width, height)
@@ -151,7 +155,7 @@ class Application(QMainWindow, TicTacToe):
         # ADDS >> Single Mode Selection to stacked widget (index: 1)
         self.stackedWidget.addWidget(self.single_mode_selection)
 
-        # defines BOARD GAME Page (where game is actuallty played
+        # defines BOARD GAME Page (where game is actually played)
         self.board_screen = QtWidgets.QWidget()
         self.board_screen.setObjectName("board_screen")
 
@@ -340,24 +344,89 @@ class Application(QMainWindow, TicTacToe):
         self.time_elapsed = QtWidgets.QLCDNumber(self.board_screen)
         self.time_elapsed.setGeometry(QtCore.QRect(10, 10, 64, 23))
         self.time_elapsed.setObjectName("time_elapsed")
+        self.time_elapsed.display("0:00")
 
-        # ADDS >> Single Mode Selection to stacked widget (index: 2)
+        # ADDS >> MAIN Game Screen to stacked widget (index: 2)
         self.stackedWidget.addWidget(self.board_screen)
 
-        self.gridLayout.addWidget(self.main_frame, 0, 0, 1, 1)
+        # defines End Game Page shows scores and gives option to play again
+        self.end_game = QtWidgets.QWidget()
+        self.end_game.setObjectName("end_game")
 
+        # Defines main label where player that won/a tie happened is indicated
+        font.setPointSize(28)
+        self.player_won_label = QtWidgets.QLabel(self.end_game)
+        self.player_won_label.setGeometry(QtCore.QRect(70, 30, 261, 61))
+        self.player_won_label.setFont(font)
+        self.player_won_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.player_won_label.setObjectName("player_won_label")
+
+        font.setPointSize(18)
+        self.play_again_label = QtWidgets.QLabel(self.end_game)
+        self.play_again_label.setGeometry(QtCore.QRect(30, 240, 361, 51))
+        self.play_again_label.setFont(font)
+        self.play_again_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.play_again_label.setObjectName("play_again_label")
+
+        self.play_again_yes_btn = QtWidgets.QPushButton(self.end_game)
+        self.play_again_yes_btn.setGeometry(QtCore.QRect(80, 300, 120, 50))
+        self.play_again_yes_btn.setFont(font)
+        self.play_again_yes_btn.setFocusPolicy(QtCore.Qt.TabFocus)
+        self.play_again_yes_btn.setObjectName("play_again_yes_btn")
+
+        self.play_again_no_btn = QtWidgets.QPushButton(self.end_game)
+        self.play_again_no_btn.setGeometry(QtCore.QRect(230, 300, 120, 50))
+        self.play_again_no_btn.setFont(font)
+        self.play_again_no_btn.setFocusPolicy(QtCore.Qt.TabFocus)
+        self.play_again_no_btn.setObjectName("play_again_no_btn")
+
+        self.score_01 = QtWidgets.QLCDNumber(self.end_game)
+        self.score_01.setGeometry(QtCore.QRect(93, 160, 91, 81))
+        self.score_01.setObjectName("score_01")
+
+        self.score_02 = QtWidgets.QLCDNumber(self.end_game)
+        self.score_02.setGeometry(QtCore.QRect(240, 160, 91, 81))
+        self.score_02.setObjectName("score_02")
+
+
+        font.setPointSize(12)
+        self.current_score_label = QtWidgets.QLabel(self.end_game)
+        self.current_score_label.setGeometry(QtCore.QRect(50, 90, 111, 41))
+        self.current_score_label.setFont(font)
+        self.current_score_label.setObjectName("current_score_label")
+
+        font.setPointSize(10)
+        self.score_01_label = QtWidgets.QLabel(self.end_game)
+        self.score_01_label.setGeometry(QtCore.QRect(90, 140, 91, 21))
+        self.score_01_label.setFont(font)
+        self.score_01_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+        self.score_01_label.setObjectName("score_01_label")
+
+        self.score_02_label = QtWidgets.QLabel(self.end_game)
+        self.score_02_label.setGeometry(QtCore.QRect(240, 140, 91, 21))
+        self.score_02_label.setFont(font)
+        self.score_02_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+        self.score_02_label.setObjectName("score_02_label")
+
+        # ADDS >> End Game Screen to stacked widget (index: 3)
+        self.stackedWidget.addWidget(self.end_game)
+
+        # ??
+        self.gridLayout.addWidget(self.main_frame, 0, 0, 1, 1)
         self.setCentralWidget(self.centralwidget)
 
+        # ??
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 450, 21))
         self.menubar.setObjectName("menubar")
         self.setMenuBar(self.menubar)
 
+        # ??
         self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-
         self.setStatusBar(self.statusbar)
 
+        # calls function that writes over labels and such
         self.retranslateUi()
 
         self.action_assignment()
@@ -377,10 +446,20 @@ class Application(QMainWindow, TicTacToe):
         self.title_label.setText(_translate("Application", "Tic Tac Toe"))
         self.title_label_2.setText(_translate("Application", "Tic Tac Toe"))
         self.difficulty_selection.setItemText(0, _translate("Application", "Easy"))
-        self.difficulty_selection.setItemText(1, _translate("Application", "Hard"))
+        self.difficulty_selection.setItemText(1, _translate("Application", "Medium"))
+        self.difficulty_selection.setItemText(2, _translate("Application", "Hard"))
         self.single_mode_label.setText(_translate("Application", "Single Mode"))
         self.select_diff_label.setText(_translate("Application", "Select Game Difficulty:"))
         self.select_piece_label.setText(_translate("Application", "Choose Your Piece:"))
+        self.play_again_label.setText(_translate("Application", "Would you like to play again?"))
+        self.play_again_yes_btn.setText(_translate("Application", "Yes"))
+        self.play_again_yes_btn.setShortcut(_translate("Application", "y"))
+        self.play_again_no_btn.setText(_translate("Application", "No"))
+        self.play_again_no_btn.setShortcut(_translate("Application", "n"))
+        self.current_score_label.setText(_translate("Application", "Current Score:"))
+        self.player_won_label.setText(_translate("Application", "Player has won!"))
+        self.score_01_label.setText(_translate("Application", "User1"))
+        self.score_02_label.setText(_translate("Application", "User2"))
 
     def set_palette(self):
         palette = QtGui.QPalette()
@@ -573,11 +652,11 @@ class Application(QMainWindow, TicTacToe):
     # Defines mode being played >> Single Player
     def select_single_mode(self):
         self.stackedWidget.setCurrentIndex(1)
-        self.mode_selected = "single"
+        self.mode = "single"
 
     # Defines mode being played >> Two player
     def select_two_player_mode(self):
-        self.mode_selected = "double"
+        self.mode = "double"
 
     # Only applicable to >> Single Player
     def single_select_piece(self, piece):
@@ -593,6 +672,11 @@ class Application(QMainWindow, TicTacToe):
         else:
             # changes screen to MAIN Board Screen
             self.stackedWidget.setCurrentIndex(2)
+            #if user chose "O" piece, computer goes first
+            if self.user == "o":
+                self.play_piece("pc", self.next_move())
+            # Begins Timer! Without it, it's only connected, but doesn't run
+            self.timer_clock.start()
 
     # THIS IS THE MAIN FUNCTION TO UPDATE GAME, PLAY PC GAME, and VERIFY IF SOMEONE WON
     def play_piece(self, playing, position: tuple):
@@ -616,6 +700,11 @@ class Application(QMainWindow, TicTacToe):
                 else:
                     piece = "./UI/circle_cell.png"
 
+            # removes move from available
+            current_move = self.move_key((row, column))
+            self.available_moves.pop(current_move)
+            print(self.available_moves)
+
             if piece != "":
                 if position == (0, 0):
                     self.label_placeholder00.setPixmap(QtGui.QPixmap(piece))
@@ -636,57 +725,111 @@ class Application(QMainWindow, TicTacToe):
                 elif position == (2, 2):
                     self.label_placeholder22.setPixmap(QtGui.QPixmap(piece))
 
-                #everytime this function is triggered, verify is someone made a winner move
+                # Every time this function is triggered, verify is someone made a winner move
                 has_won = self.has_won()
-                if has_won[0] == 1:
-                    self.stackedWidget.setCurrentIndex(0)
-                    # self.show_endgame_popup(has_won[1])
+                has_tied = self.has_tied()
+                if has_won[0] == 1 or has_tied:
+                    if str(has_won[1]) == self.user:
+                        self.endgame("user1")
+                    elif str(has_won[1]) == self.computer:
+                        self.endgame("pc")
+                    elif self.mode == "double" and str(has_won[1]) != self.user:
+                        self.endgame("user2")
+                    elif has_tied:
+                        self.endgame("tie")
+                else: # if game has not ended, call for pc
+                    # if user is playing, call function to ensure computer plays also
+                    if playing == "user" and self.mode == "single":
+                        self.play_piece("pc", self.next_move())
 
-                # if user is playing, call function to ensure computer plays also
-                if playing == "user":
-                    self.play_piece("pc", self.next_move())
 
-                if has_won[0] == 1:
-                    self.stackedWidget.setCurrentIndex(0)
-                    # self.show_endgame_popup(has_won[1])
+    def endgame(self, winner: str):
+        # updates the title with {winner} has won! OR Game has tied!
+        # increments score with winner IF there was one
+        if winner == "user1":
+            self.player_won_label.setText("Player 1 has won!")
+            self.player_won_label.adjustSize()
+            self.score_user01 += 1
+        elif winner == "user2":
+            self.player_won_label.setText("Player 2 has won!")
+            self.player_won_label.adjustSize()
+            self.score_user02 += 1
+        elif winner == "pc":
+            self.player_won_label.setText("Computer has won!")
+            self.player_won_label.adjustSize()
+            self.score_computer += 1
+        elif winner == "tie":
+            self.player_won_label.setText("Game has tied!")
+            self.player_won_label.adjustSize()
+        self.player_won_label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
-                # self.print_board()
+        # displays score based on mode being played
+        # IF single: display Computer and User1 score ; update labels 01 and 02 to computer and user
+        # If double: display user1 and user2 score ; update labels 01 and 02 to user 1 and user 2
+        if self.mode == "single":
+            self.score_01_label.setText("Player 1")
+            self.score_01_label.adjustSize()
+            self.score_01.display(self.score_user01)
 
-    def show_endgame_popup(self, winner: str):
-        message = QtWidgets.QMessageBox
-        message.setWindowTitle("Winner!")
-        message.setText(f"{winner} has just won the game! Congratulations!")
+            self.score_02_label.setText("Computer")
+            self.score_02_label.adjustSize()
+            self.score_02.display(self.score_computer)
+        elif self.mode == "double":
+            self.score_01_label.setText("Player 1")
+            self.score_01_label.adjustSize()
+            self.score_01.display(self.score_user01)
 
-        # Available Icons: .Critical .Warning .Information .Question
-        message.setIcon(QMessageBox_Icon=QtWidgets.QMessageBox.Question)
+            self.score_02_label.setText("Player 2")
+            self.score_02_label.adjustSize()
+            self.score_02.display(self.score_user02)
+        self.score_01_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+        self.score_02_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
-        # Available Buttons:
-        # .Ok
-        # .Open
-        # .Save
-        # .Cancel
-        # .Close
-        # .Yes
-        # .No
-        # .Abort
-        # .Retry
-        # .Ignore
-        #
-        # set as many as you'd like, on message.setStandardButtons(), each separated by |
-        message.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        # reset timer variables and stop clock event
+        self.seconds = 0
+        self.minutes = 0
+        self.time_elapsed.display("0:00")
+        self.timer_clock.stop()
 
-        # interesting when you have more than one
-        message.setDefaultButton(QtWidgets.QMessageBox.Ok)
+        # resets board
+        piece = "./UI/empty_cell.png"
+        self.label_placeholder00.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder01.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder02.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder10.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder11.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder12.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder20.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder21.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder22.setPixmap(QtGui.QPixmap(piece))
 
-        message.setInformativeText("Would you like to play again?")
+        # routes window to End Game Page
+        self.stackedWidget.setCurrentIndex(3)
 
-        # connects method to the popup
-        message.buttonClicked.connect(self.popup_press)
-        message.exec_()
+    # method attached to "Play again? YES" button of End game screen
+    # resets control variables of Tic Tac Toe class only partially using .reset("part") method
+    def play_again_yes(self):
+        self.reset("part")
+        self.stackedWidget.setCurrentIndex(1)
 
-    def popup_press(self, widget):
-        if widget.Text() == "Ok":
-            self.stackedWidget.setCurrentIndex(0)
+    # method attached to "Play again? NO" button of End game screen
+    # resets control variables of Tic Tac Toe class completely using .reset("all") method
+    def play_again_no(self):
+        self.reset("all")
+        self.stackedWidget.setCurrentIndex(0)
+
+    # updates the two values that control time elapsed and prints them out in a clock format fashion
+    def update_timer(self):
+        if 0 <= self.seconds < 60:
+            self.seconds += 1
+        else:
+            self.seconds = 0
+            self.minutes += 1
+
+        if self.seconds // 10 == 0:
+            self.time_elapsed.display(f"{self.minutes}:0{self.seconds}")
+        else:
+            self.time_elapsed.display(f"{self.minutes}:{self.seconds}")
 
     def action_assignment(self):
         # ASSIGNS ACTION TO BUTTON 1 >> Modify screen
@@ -706,6 +849,13 @@ class Application(QMainWindow, TicTacToe):
         self.clickable(self.label_placeholder20).connect(lambda: self.play_piece("user", (2, 0)))
         self.clickable(self.label_placeholder21).connect(lambda: self.play_piece("user", (2, 1)))
         self.clickable(self.label_placeholder22).connect(lambda: self.play_piece("user", (2, 2)))
+
+        # Connects timer clock
+        self.timer_clock.timeout.connect(self.update_timer)
+
+        # Connects Play Again buttons of End Game Screen
+        self.play_again_yes_btn.clicked.connect(self.play_again_yes)
+        self.play_again_no_btn.clicked.connect(self.play_again_no)
 
 
 def window():
