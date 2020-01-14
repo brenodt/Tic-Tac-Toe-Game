@@ -799,16 +799,7 @@ class Application(QMainWindow, TicTacToe):
         self.timer_clock.stop()
 
         # resets board
-        piece = "./UI/empty_cell.png"
-        self.label_placeholder00.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder01.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder02.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder10.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder11.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder12.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder20.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder21.setPixmap(QtGui.QPixmap(piece))
-        self.label_placeholder22.setPixmap(QtGui.QPixmap(piece))
+        self.reset_board()
 
         # routes window to End Game Page
         self.stackedWidget.setCurrentIndex(3)
@@ -829,7 +820,21 @@ class Application(QMainWindow, TicTacToe):
     # resets control variables of Tic Tac Toe class completely using .reset("all") method
     def quit_current_game(self):
         self.reset("all")
+        self.reset_board()
         self.stackedWidget.setCurrentIndex(0)
+
+    # helper method to clear the game board
+    def reset_board(self):
+        piece = "./UI/empty_cell.png"
+        self.label_placeholder00.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder01.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder02.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder10.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder11.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder12.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder20.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder21.setPixmap(QtGui.QPixmap(piece))
+        self.label_placeholder22.setPixmap(QtGui.QPixmap(piece))
 
     # updates the two values that control time elapsed and prints them out in a clock format fashion
     def update_timer(self):
