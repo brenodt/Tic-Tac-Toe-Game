@@ -750,7 +750,6 @@ class Application(QMainWindow, TicTacToe):
                     if playing == "user" and self.mode == "single":
                         self.play_piece("pc", self.next_move())
 
-
     def endgame(self, winner: str):
         # updates the title with {winner} has won! OR Game has tied!
         # increments score with winner IF there was one
@@ -826,6 +825,12 @@ class Application(QMainWindow, TicTacToe):
         self.reset("all")
         self.stackedWidget.setCurrentIndex(0)
 
+    # method attached to "Quit" button of main board screen
+    # resets control variables of Tic Tac Toe class completely using .reset("all") method
+    def quit_current_game(self):
+        self.reset("all")
+        self.stackedWidget.setCurrentIndex(0)
+
     # updates the two values that control time elapsed and prints them out in a clock format fashion
     def update_timer(self):
         if 0 <= self.seconds < 60:
@@ -860,6 +865,9 @@ class Application(QMainWindow, TicTacToe):
 
         # Connects timer clock
         self.timer_clock.timeout.connect(self.update_timer)
+
+        # Connects quit game button
+        self.quit_game.clicked.connect(self.quit_current_game)
 
         # Connects Play Again buttons of End Game Screen
         self.play_again_yes_btn.clicked.connect(self.play_again_yes)
