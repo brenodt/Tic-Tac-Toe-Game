@@ -711,7 +711,6 @@ class Application(QMainWindow, TicTacToe):
             # removes move from available
             current_move = self.move_key((row, column))
             self.available_moves.pop(current_move)
-            print(self.available_moves)
 
             if piece != "":
                 if position == (0, 0):
@@ -793,11 +792,7 @@ class Application(QMainWindow, TicTacToe):
         self.score_02_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
         # reset timer variables and stop clock event
-        self.seconds = 0
-        self.minutes = 0
-        self.time_elapsed.display("0:00")
-        self.timer_clock.stop()
-
+        self.reset_timer()
         # resets board
         self.reset_board()
 
@@ -821,6 +816,7 @@ class Application(QMainWindow, TicTacToe):
     def quit_current_game(self):
         self.reset("all")
         self.reset_board()
+        self.reset_timer()
         self.stackedWidget.setCurrentIndex(0)
 
     # helper method to clear the game board
@@ -835,6 +831,13 @@ class Application(QMainWindow, TicTacToe):
         self.label_placeholder20.setPixmap(QtGui.QPixmap(piece))
         self.label_placeholder21.setPixmap(QtGui.QPixmap(piece))
         self.label_placeholder22.setPixmap(QtGui.QPixmap(piece))
+
+    # helper method to restart the clock
+    def reset_timer(self):
+        self.seconds = 0
+        self.minutes = 0
+        self.time_elapsed.display("0:00")
+        self.timer_clock.stop()
 
     # updates the two values that control time elapsed and prints them out in a clock format fashion
     def update_timer(self):

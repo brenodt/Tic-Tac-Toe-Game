@@ -50,6 +50,8 @@ class TicTacToe:
             return 1
         return 0
 
+    # helper function: determines the "key" of current move, from 1 to 9, based on position on matrix
+    # left-top corner == 1 ; right-bottom corner == 9
     def move_key(self, pos: tuple):
         if pos == (0, 0):
             return 1
@@ -82,14 +84,13 @@ class TicTacToe:
 
                 if is_valid:
                     row, column = self.available_moves[current_move]
+
+                    # both statements below are unnecessary as it will be done in GUI Level once function is called
+                    # this is only used when debugging the class directly thru play_game()
                     # self.board[row][column] = self.computer  # changes position value to pc piece
                     # self.available_moves.pop(current_move)
-                    # both statements are unnecessary as it will be done in GUI Level once function is called
-                    # this is only used when debugging the class directly thru play_game()
 
                     return row, column
-
-                    break
         elif self.difficulty == "medium":
             pass
         elif self.difficulty == "hard":
