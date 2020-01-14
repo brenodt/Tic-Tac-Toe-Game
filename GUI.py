@@ -159,6 +159,13 @@ class Application(QMainWindow, TicTacToe):
         self.board_screen = QtWidgets.QWidget()
         self.board_screen.setObjectName("board_screen")
 
+        # defines Quit game button
+        self.quit_game = QtWidgets.QPushButton(self.board_screen)
+        self.quit_game.setGeometry(QtCore.QRect(330, 10, 90, 30))
+        font.setPointSize(14)
+        self.quit_game.setFont(font)
+        self.quit_game.setObjectName("quit_game")
+
         # defines frame that holds all subframes where pieces will be placed
         self.frame_board = QtWidgets.QFrame(self.board_screen)
         self.frame_board.setGeometry(QtCore.QRect(80, 50, 281, 281))
@@ -346,7 +353,7 @@ class Application(QMainWindow, TicTacToe):
         self.time_elapsed.setObjectName("time_elapsed")
         self.time_elapsed.display("0:00")
 
-        # ADDS >> MAIN Game Screen to stacked widget (index: 2)
+        # ADDS >> After Game to stacked widget (index: 3)
         self.stackedWidget.addWidget(self.board_screen)
 
         # defines End Game Page shows scores and gives option to play again
@@ -451,6 +458,7 @@ class Application(QMainWindow, TicTacToe):
         self.single_mode_label.setText(_translate("Application", "Single Mode"))
         self.select_diff_label.setText(_translate("Application", "Select Game Difficulty:"))
         self.select_piece_label.setText(_translate("Application", "Choose Your Piece:"))
+        self.quit_game.setText(_translate("Application", "Quit"))
         self.play_again_label.setText(_translate("Application", "Would you like to play again?"))
         self.play_again_yes_btn.setText(_translate("Application", "Yes"))
         self.play_again_yes_btn.setShortcut(_translate("Application", "y"))
